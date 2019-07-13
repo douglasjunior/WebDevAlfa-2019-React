@@ -7,12 +7,15 @@ import {
 } from 'reactstrap';
 import {
   Link, BrowserRouter,
-  Route,
+  Route, Switch,
 } from 'react-router-dom';
 
 import Home from '../pages/Home';
 import Tasks from '../pages/Tasks';
 import About from '../pages/About';
+import Login from '../pages/Login';
+import NotFound from '../pages/NotFound';
+import PrivateRoute from '../components/PrivateRoute';
 
 class MainLayout extends Component {
 
@@ -22,7 +25,7 @@ class MainLayout extends Component {
         <BrowserRouter>
           <Navbar color="light" expand="xs">
             <NavbarBrand>
-              <Link to='/'>WebDev</Link>
+              <Link to='/'>WebDev!</Link>
             </NavbarBrand>
             <Nav className="ml-auto" navbar>
               <NavItem>
@@ -38,9 +41,13 @@ class MainLayout extends Component {
             </Nav>
           </Navbar>
           <Container>
-            <Route path="/" exact component={Home} />
-            <Route path="/tasks" component={Tasks} />
-            <Route path="/about" component={About} />
+            <Switch>
+              <Route path="/" exact component={Home} />
+              <PrivateRoute path="/tasks" component={Tasks} />
+              <Route path="/about" component={About} />
+              <Route path="/login" component={Login} />
+              <Route component={NotFound} />
+            </Switch>
           </Container>
         </BrowserRouter>
       </div>

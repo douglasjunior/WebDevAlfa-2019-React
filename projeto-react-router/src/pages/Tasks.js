@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 
 import { Link, Route } from 'react-router-dom';
+import { Button, Table } from 'reactstrap';
+import axios from 'axios';
+
+import fakeAuth from '../helpers/fake-auth';
 
 const TASKS = [
   {
@@ -22,6 +26,24 @@ const TASKS = [
 
 class Tasks extends Component {
 
+  state = {
+    tasks: []
+  }
+
+  componentDidMount() {
+    axios.get('https://jsonplaceholder.typicode.com/todos')
+      .then(response => {
+        const { data } = response;
+        this.setState({
+          tasks: data
+        })
+      })
+      .catch(err => {
+        console.warn(err);
+        alert(err.message)
+      })
+  }
+
   /*
     const tasksItems = TASKS.map(task => <li>{task.title}</li>);
 
@@ -38,43 +60,67 @@ class Tasks extends Component {
   // /tasks/2
   // /tasks/3
   renderTasks = () => {
-    const tasksItems = TASKS.map((task) => {
+    const { tasks } = this.state;
+    const tasksItems = tasks.map((task) => {
       return (
-        <li>
-          <Link to={'/tasks/' + task.id}>
-            {task.title}
-          </Link>
-        </li>
+        <tr>
+          <td>{task.id}</td>
+          <td>
+            <Link to={'/tasks/' + task.id}>
+              {task.title}
+            </Link>
+          </td>
+          <td>{task.userId}</td>
+          <td>{task.completed ? 'Sim' : 'Não'}</td>
+        </tr>
       )
     });
     return tasksItems;
   }
 
   renderTaskDescription = (routeProps) => {
+    const { tasks } = this.state;
     const taskId = parseInt(routeProps.match.params.taskId);
-    const task = TASKS.find((task) => {
+    const task = tasks.find((task) => {
       return task.id === taskId;
     })
-
     if (!task) {
       return (
         <p>Tarefa não encontrada</p>
       )
     }
-
-    return(
+    return (
       <p>
-        {task.description}
+        {task.id} - {task.title} - {task.completed ? 'Sim' : 'Não'}
       </p>
     )
+  }
+
+  onSairClick = () => {
+    fakeAuth.setAuthenticated(false)
+    this.props.history.push('/login')
   }
 
   render() {
     return (
       <div>
-        <ul>
-          {this.renderTasks()}
-        </ul>
+        <Button color="danger" onClick={this.onSairClick}>
+          Sair
+        </Button>
+
+        <Table>
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Título</th>
+              <th>Usuário</th>
+              <th>Concluída</th>
+            </tr>
+          </thead>
+          <tbody>
+            {this.renderTasks()}
+          </tbody>
+        </Table>
 
         <br />
 
